@@ -16,7 +16,9 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<body className={lexend.className}>{children}</body>
+			<body className={lexend.className}>
+				<div className="min-h-screen">{children}</div>
+			</body>
 		</html>
 	);
 }
