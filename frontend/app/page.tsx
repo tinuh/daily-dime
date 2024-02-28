@@ -31,11 +31,14 @@ export default function Home() {
 	const [players, setPlayers] = React.useState<DailyChallenge[] | undefined>(
 		[]
 	);
+	const [revealAnswer, setRevealAnswer] = React.useState<boolean>(false);
 
 	React.useEffect(() => {
 		// set the gamme
 		let temp = data;
-		temp?.forEach((player) => (player.color = "gray"));
+		temp?.forEach((player) => {
+			player.color = "gray";
+		});
 		setPlayers(temp);
 	}, [data]);
 
@@ -61,10 +64,12 @@ export default function Home() {
 			console.log("temp", temp);
 
 			// compare the two arrays
+			let count = 0;
 			let newPlayers: DailyChallenge[] = JSON.parse(JSON.stringify(players));
 			newPlayers?.forEach((player, i) => {
 				if (player.name === temp[i].name) {
 					player.color = "green";
+					count++;
 				} else if (
 					player.name === temp[i - 1]?.name ||
 					player.name === temp[i + 1]?.name
@@ -72,6 +77,11 @@ export default function Home() {
 					player.color = "yellow";
 				}
 			});
+
+			if (count === players.length) {
+				setRevealAnswer(true);
+			}
+
 			setPlayers(newPlayers);
 		}
 	};
@@ -129,7 +139,9 @@ export default function Home() {
 																		/>
 																	)}
 																</p>
-																{/* <p className="">{player.ppg} PPG</p> */}
+																{revealAnswer && (
+																	<p className="">{player.ppg} PPG</p>
+																)}
 															</div>
 														</div>
 														<div className="flex items-center gap-3 pr-5">
