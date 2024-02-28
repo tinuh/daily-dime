@@ -42,7 +42,7 @@ class Player(BaseModel):
     team_abbreviation: str
 
 @app.on_event("startup")
-@repeat_every(seconds=86400)
+@repeat_every(seconds=60)
 def regenerate_daily_challenge():
     global daily_challenge
 
