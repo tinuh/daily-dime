@@ -16,6 +16,7 @@ interface DailyChallenge {
 	ppg?: number;
 	team_id: number;
 	team_abbreviation: string;
+	color?: string;
 }
 
 const fetcher = (url: string): Promise<DailyChallenge[]> =>
@@ -32,19 +33,46 @@ export default function Home() {
 	);
 
 	React.useEffect(() => {
-		// cache page in state
-		setPlayers(data);
+		// set the gamme
+		let temp = data;
+		temp?.forEach((player) => (player.color = "gray"));
+		setPlayers(temp);
 	}, [data]);
 
 	const onDragEnd = (result: any) => {
 		if (!result.destination) return;
 
 		if (players) {
-			const items = players;
+			const items = JSON.parse(JSON.stringify(players));
 			const [reorderedItem] = items.splice(result.source.index, 1);
 			items.splice(result.destination.index, 0, reorderedItem);
 
 			setPlayers(items);
+		}
+	};
+
+	// verify the order and set green if in the right position based on ppg and yellow if in nearby position
+	const verifyOrder = () => {
+		// create a temp array sorted by ppg
+		if (players) {
+			let temp: DailyChallenge[] = JSON.parse(JSON.stringify(players));
+			temp.sort((a, b) => (b.ppg ? b.ppg : 0) - (a.ppg ? a.ppg : 0));
+
+			console.log("temp", temp);
+
+			// compare the two arrays
+			let newPlayers: DailyChallenge[] = JSON.parse(JSON.stringify(players));
+			newPlayers?.forEach((player, i) => {
+				if (player.name === temp[i].name) {
+					player.color = "green";
+				} else if (
+					player.name === temp[i - 1]?.name ||
+					player.name === temp[i + 1]?.name
+				) {
+					player.color = "yellow";
+				}
+			});
+			setPlayers(newPlayers);
 		}
 	};
 
@@ -69,14 +97,16 @@ export default function Home() {
 										{...provided.droppableProps}
 										ref={provided.innerRef}
 									>
-										{data.map((player, i) => (
+										{players?.map((player, i) => (
 											<Draggable key={i} draggableId={String(i)} index={i}>
 												{(provided: any) => (
 													<div
 														ref={provided.innerRef}
 														{...provided.draggableProps}
 														{...provided.dragHandleProps}
-														className="mb-5 rounded-full bg-gray-300 border-2 border-gray-600 flex justify-between text-black dark:text-white"
+														className={`mb-5 rounded-full bg-${
+															player.color ? player.color : "gray"
+														}-300 border-2 border-gray-600 flex justify-between text-black dark:text-white`}
 													>
 														<div className="flex gap-3">
 															<img
@@ -99,7 +129,7 @@ export default function Home() {
 																		/>
 																	)}
 																</p>
-																<p className="">{player.ppg} PPG</p>
+																{/* <p className="">{player.ppg} PPG</p> */}
 															</div>
 														</div>
 														<div className="flex items-center gap-3 pr-5">
@@ -120,7 +150,10 @@ export default function Home() {
 							</Droppable>
 						</div>
 						<div className="flex justify-center">
-							<button className="bg-teal-600 rounded-md p-3 text-white transition-all hover:scale-105 flex gap-2 items-center">
+							<button
+								className="bg-teal-600 rounded-md p-3 text-white transition-all hover:scale-105 flex gap-2 items-center"
+								onClick={() => verifyOrder()}
+							>
 								Check <FaCheck className="inline" />
 							</button>
 						</div>
