@@ -86,6 +86,20 @@ export default function Home() {
 		}
 	};
 
+	const movePlayer = (index: number, direction: "up" | "down") => {
+		if (players) {
+			const items = JSON.parse(JSON.stringify(players));
+			const [reorderedItem] = items.splice(index, 1);
+			if (direction === "up") {
+				items.splice(index - 1, 0, reorderedItem);
+			} else {
+				items.splice(index + 1, 0, reorderedItem);
+			}
+
+			setPlayers(items);
+		}
+	}
+
 	return (
 		<main className="p-12">
 			<h1 className="text-center text-3xl font-bold text-black dark:text-white ">
@@ -145,10 +159,10 @@ export default function Home() {
 															</div>
 														</div>
 														<div className="flex items-center gap-3 pr-5">
-															<button className="bg-cyan-600 border-4 border-black rounded-full p-2">
+															<button onClick={() => movePlayer(i, "up")} className="bg-cyan-600 border-4 border-black rounded-full p-2">
 																<FaArrowUp className="w-8 h-8" />
 															</button>
-															<button className="bg-rose-600 border-4 border-black rounded-full p-2">
+															<button onClick={() => movePlayer(i, "down")} className="bg-rose-600 border-4 border-black rounded-full p-2">
 																<FaArrowDown className="w-8 h-8" />
 															</button>
 														</div>
