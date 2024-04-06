@@ -75,6 +75,8 @@ export default function Home() {
 					player.name === temp[i + 1]?.name
 				) {
 					player.color = "yellow";
+				} else {
+					player.color = "gray"
 				}
 			});
 
